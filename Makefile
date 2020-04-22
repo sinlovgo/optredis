@@ -7,7 +7,7 @@ TOP_DIR := $(shell pwd)
 # endif
 
 # each tag change this
-ENV_DIST_VERSION := v0.1.0
+ENV_DIST_VERSION := v0.1.1
 # need open proxy 1 is need 0 is default
 ENV_NEED_PROXY=1
 

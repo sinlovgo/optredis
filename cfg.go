@@ -18,11 +18,11 @@ const (
 )
 
 type Config struct {
-	Name          string
-	UseBoomFilter bool
-	BloomK        uint
-	BloomN        uint
-	BloomM        uint
+	Name           string
+	UseBloomFilter bool
+	BloomK         uint
+	BloomN         uint
+	BloomM         uint
 }
 
 var defaultConfig = setDefaultConfig()
@@ -31,11 +31,11 @@ type ConfigOption func(*Config)
 
 func setDefaultConfig() *Config {
 	return &Config{
-		Name:          "default",
-		UseBoomFilter: false,
-		BloomK:        20,
-		BloomN:        1000,
-		BloomM:        5,
+		Name:           "default",
+		UseBloomFilter: false,
+		BloomK:         20,
+		BloomN:         1000,
+		BloomM:         5,
 	}
 }
 
@@ -54,9 +54,9 @@ func WithName(name string) ConfigOption {
 	}
 }
 
-func WithUseBoomFilter(useBoomFilter bool) ConfigOption {
+func WithUseBloomFilter(useBloomFilter bool) ConfigOption {
 	return func(o *Config) {
-		o.UseBoomFilter = useBoomFilter
+		o.UseBloomFilter = useBloomFilter
 	}
 }
 

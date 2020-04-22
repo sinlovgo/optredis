@@ -46,11 +46,75 @@ $ echo "go mod vendor"
 
 ## use
 
+- viper config struct as
+
+```go
+package cfg
+
+import "github.com/sinlovgo/optredis/optredisconfig"
+
+var global *Conf
+
+func Global() Conf {
+	return *global
+}
+
+type Conf struct {
+	RunMode        string               `json:"run_mode" mapstructure:"run_mode"`
+	Name           string               `json:"name" mapstructure:"name"`
+	RedisOptConfig []optredisconfig.Cfg `json:"redis_clients" mapstructure:"redis_clients"`
+}
+```
+
+then viper config file look like
+
+```go
+package cfg
+
+import "github.com/spf13/viper"
+
+func InitConfigByViper(configPath string) error {
+	viper.SetConfigFile(configPath)
+	viper.SetConfigType("yaml")
+	if err := viper.ReadInConfig(); err != nil {
+		return err
+	}
+	err := viper.Unmarshal(&global)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+```
+
+```yaml
+run_mode: debug                # run mode: debug, test, release
+name: test-server              # name
+
+redis_clients:
+  - name: default
+    addr: localhost:35021
+    password:
+    db: 0
+    max_retries: 0 # Default is to not retry failed commands
+    dial_timeout: 5 # Default is 5 seconds.
+    read_timeout: 3 # Default is 3 seconds.
+    write_timeout: 3 # Default is ReadTimeout
+```
+
+- load viper as
+
+```go
+
+```
+
 - optredis client and tools of `default.go`
 
 ```go
 package cacheDefault
-import "github.com/sinlovgo/optredis"
+import (
+	"github.com/sinlovgo/optredis"
+)
 const (
 	name string = "default"
 )
@@ -61,7 +125,11 @@ func Init() error {
 	if defaultOptRedis == nil {
 		config := optredis.NewConfig(
 			optredis.WithName("default"),
-			optredis.WithUseBoomFilter(false),
+		)
+		// or use bloom filter
+		config := optredis.NewConfig(
+			optredis.WithName("default"),
+			optredis.WithUseBloomFilter(true),
 			optredis.WithUseBloomK(20),
 			optredis.WithUseBloomN(1000),
 			optredis.WithUseBloomM(5),
@@ -87,6 +155,7 @@ package main
 
 import (
 	"cacheDefault"
+	"cfg"
 	"fmt"
 	"github.com/sinlovgo/optredis"
 )

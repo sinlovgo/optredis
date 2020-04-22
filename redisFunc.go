@@ -3,8 +3,8 @@ package optredis
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/sinlovgo/optredis/optredisconfig"
 	"github.com/go-redis/redis"
+	"github.com/sinlovgo/optredis/optredisconfig"
 	"github.com/willf/bloom"
 	"time"
 )
@@ -213,7 +213,7 @@ type RedisFunc interface {
 func NewOptRedis(cfg Config) RedisFunc {
 	return &OptRedis{
 		Name:          cfg.Name,
-		UseBoomFilter: cfg.UseBoomFilter,
+		UseBoomFilter: cfg.UseBloomFilter,
 
 		errClientNotInit: fmt.Errorf("%v opt redis : client empty, must be init", cfg.Name),
 		errKeyEmpty:      fmt.Errorf("%v opt redis : key is empty plase check", cfg.Name),
