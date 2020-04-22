@@ -5,7 +5,7 @@
 
 ## for what
 
-- this project used to github golang
+- redis client loader and support bloom filter
 
 ## depends
 
@@ -45,6 +45,95 @@ $ echo "go mod vendor"
 - github.com/willf/bloom v2.0.3
 
 ## use
+
+- optredis client and tools of `default.go`
+
+```go
+package cacheDefault
+import "github.com/sinlovgo/optredis"
+const (
+	name string = "default"
+)
+
+var defaultOptRedis *optredis.OptRedis
+
+func Init() error {
+	if defaultOptRedis == nil {
+		config := optredis.NewConfig(
+			optredis.WithName("default"),
+			optredis.WithUseBoomFilter(false),
+			optredis.WithUseBloomK(20),
+			optredis.WithUseBloomN(1000),
+			optredis.WithUseBloomM(5),
+		)
+		optRedis, err := optredis.NewOptRedis(*config).InitByName().Ping()
+		if err != nil {
+			return err
+		}
+		defaultOptRedis = &optRedis
+	}
+	return nil
+}
+
+func Opt() *optredis.OptRedis {
+	return defaultOptRedis
+}
+```
+
+- init at `main.go`
+
+```go
+package main
+
+import (
+	"cacheDefault"
+	"fmt"
+	"github.com/sinlovgo/optredis"
+)
+func main()  {
+	err := InitRedisOpt()
+	if err!= nil {
+		fmt.Printf("init optredis err: %v", err)
+	}
+}
+
+func InitRedisOpt() error {
+	err := optredis.InitByConfigList(cfg.Global().RedisOptConfig)
+	if err != nil {
+		return err
+	}
+	return cacheDefault.Init()
+}
+```
+
+- then can use topic of cache student, student struct at package at `demo`
+
+```go
+package cacheTopicDemo
+import (
+	"cacheDefault"
+	"demo"
+	"time"
+)
+
+const (
+	cpStudentPrefix string = "cache-student-"
+	// one week
+	cpStudentExpiration = time.Duration(24) * time.Hour
+)
+
+func ExistsStudent(key string) (bool, error) {
+	return cacheDefault.Opt().Exists(key, cpStudentPrefix)
+}
+
+func Set(key string, data *demo.Student) error {
+	return cacheDefault.Opt().SetJson(key, cpStudentPrefix, data, cpStudentExpiration)
+}
+
+func Get(key string, data *demo.Student) error {
+	return cacheDefault.Opt().GetJson(key, cpStudentPrefix, data)
+}
+```
 
 ## dev
 
