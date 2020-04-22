@@ -87,6 +87,8 @@ func InitConfigByViper(configPath string) error {
 }
 ```
 
+- config file `conf.yml`
+
 ```yaml
 run_mode: debug                # run mode: debug, test, release
 name: test-server              # name
@@ -100,12 +102,6 @@ redis_clients:
     dial_timeout: 5 # Default is 5 seconds.
     read_timeout: 3 # Default is 3 seconds.
     write_timeout: 3 # Default is ReadTimeout
-```
-
-- load viper as
-
-```go
-
 ```
 
 - optredis client and tools of `default.go`
@@ -160,7 +156,11 @@ import (
 	"github.com/sinlovgo/optredis"
 )
 func main()  {
-	err := InitRedisOpt()
+	err :=cfg.InitConfigByViper("conf.yml")
+	if err!= nil {
+		fmt.Printf("init InitConfigByViper err: %v", err)
+	}
+	err = InitRedisOpt()
 	if err!= nil {
 		fmt.Printf("init optredis err: %v", err)
 	}
